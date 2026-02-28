@@ -1,0 +1,13 @@
+fastapi>=0.116.0
+nltk>=3.9.2
+uvicorn[standard]>=0.35.0
+pydantic-settings>=2.10.0
+pyyaml>=6.0.2
+python-multipart>=0.0.20
+fastembed>=0.7.1
+docling>=2.48.0
+openai>=1.75.0
+
+[dev]
+httpx>=0.28.0
+pytest>=8.4.0

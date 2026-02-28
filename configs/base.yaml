@@ -1,0 +1,43 @@
+app:
+  name: rag-product
+  environment: dev
+
+llm:
+  provider: openai
+  model: gpt-5-mini
+  temperature: 0.2
+  max_output_tokens: 3000
+
+retrieval:
+  strategy: hybrid
+  top_k: 12
+  bm25_weight: 0.35
+  dense_weight: 0.65
+  preprocessing:
+    language: english
+    use_nltk_stopwords: true
+    expand_synonyms: true
+    max_synonyms_per_term: 1
+    min_token_length: 2
+    expansions: {}
+  rerank:
+    enabled: true
+    model: bge-reranker-large
+    top_k: 6
+
+chunking:
+  method: semantic
+  max_tokens: 450
+  overlap_tokens: 80
+
+citations:
+  enabled: true
+  max_citations: 6
+
+security:
+  enforce_acl: true
+  redact_secrets: true
+
+observability:
+  traces: true
+  log_prompts: false

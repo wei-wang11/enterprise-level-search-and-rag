@@ -1,0 +1,128 @@
+Metadata-Version: 2.4
+Name: enterprise-level-search-and-rag
+Version: 0.1.0
+Summary: Draft scaffold for an enterprise-grade search and RAG service.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.116.0
+Requires-Dist: nltk>=3.9.2
+Requires-Dist: uvicorn[standard]>=0.35.0
+Requires-Dist: pydantic-settings>=2.10.0
+Requires-Dist: pyyaml>=6.0.2
+Requires-Dist: python-multipart>=0.0.20
+Requires-Dist: fastembed>=0.7.1
+Requires-Dist: docling>=2.48.0
+Requires-Dist: openai>=1.75.0
+Provides-Extra: dev
+Requires-Dist: httpx>=0.28.0; extra == "dev"
+Requires-Dist: pytest>=8.4.0; extra == "dev"
+
+# enterprise-level-search-and-rag
+
+Enterprise search and RAG workspace with a separate FastAPI backend and React + TypeScript frontend.
+
+## Stack
+
+- Backend: FastAPI
+- Frontend: React + TypeScript with Vite
+- Vector store: Qdrant
+- Document store: SQLite
+- Retrieval: hybrid BM25 + vector search
+
+## Structure
+
+```text
+.
+├─ README.md
+├─ pyproject.toml
+├─ .env.example
+├─ Dockerfile
+├─ docker-compose.yml
+├─ frontend/
+│  ├─ package.json
+│  ├─ vite.config.ts
+│  └─ src/
+│     ├─ App.tsx
+│     ├─ api.ts
+│     ├─ main.tsx
+│     └─ styles.css
+├─ configs/
+│  ├─ base.yaml
+│  └─ usecases/
+│     └─ contracts.yaml
+├─ src/
+│  ├─ app/
+│  ├─ core/
+│  ├─ indexing/
+│  ├─ rag/
+│  └─ storage/
+└─ tests/
+```
+
+## Run With Docker
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build
+```
+
+This starts:
+
+- Backend API: `http://127.0.0.1:8000`
+- Frontend: `http://127.0.0.1:5173`
+- Qdrant: `http://127.0.0.1:6333`
+
+## Run Locally
+
+Backend:
+
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend proxies `/v1` requests to the backend during development. By default it targets `http://127.0.0.1:8000`.
+
+## Environment
+
+Important variables:
+
+- `FRONTEND_ORIGIN=http://localhost:5173`
+- `VECTOR_STORE_URL=...`
+- `QDRANT_API_KEY=...`
+- `QDRANT_COLLECTION=rag_chunks`
+- `DOC_STORE_URL=sqlite:///./data/rag.db`
+- `EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2`
+- `EMBEDDING_DIMENSION=384`
+- `OPENAI_API_KEY=...`
+
+Frontend API target:
+
+- `VITE_API_BASE_URL=` for direct browser calls when needed
+- `VITE_PROXY_TARGET=http://127.0.0.1:8000` for Vite dev proxy
+
+## Current Capabilities
+
+- Upload `.txt`, `.md`, and `.pdf` files
+- View indexed files in the frontend
+- Delete individual files or clear the full index
+- Hybrid retrieval using SQLite FTS5 BM25 plus Qdrant vector search
+- Generate answers with retrieved context
+
+## PDF Extraction
+
+- PDF uploads are parsed with Docling before chunking and indexing.
+- If `docling` is not installed in the backend environment, PDF uploads will fail with a clear error message.
+
+## Notes
+
+- The backend is API-only and CORS allows the configured frontend origin.
+- If you change embedding models, clear and rebuild the index.
+- If OpenAI quota is unavailable, generation will fail even when retrieval succeeds.

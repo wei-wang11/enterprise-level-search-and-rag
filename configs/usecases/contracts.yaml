@@ -1,0 +1,30 @@
+usecase:
+  name: contracts
+  system_prompt: usecases/contracts_system.md
+
+retrieval:
+  top_k: 20
+  preprocessing:
+    expand_synonyms: false
+    expansions:
+      nda:
+        - non
+        - disclosure
+        - agreement
+      msa:
+        - master
+        - services
+        - agreement
+  rerank:
+    enabled: true
+    top_k: 8
+
+chunking:
+  method: structure_aware
+  max_tokens: 300
+  overlap_tokens: 60
+
+generation:
+  require_citations: true
+  refusal_when_low_evidence: true
+  output_schema: ContractAnswer
